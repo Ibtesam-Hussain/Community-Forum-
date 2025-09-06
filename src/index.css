@@ -1,4 +1,15 @@
-
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loader {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #cbd5e1;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

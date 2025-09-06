@@ -1,35 +1,67 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import Auth from './pages/Auth';
+import Feed from './pages/Feed';
+import { useAuth } from './context/AuthContext';
+import Profile from "./pages/Profile";
+import QuestionDetail from "./pages/QuestionDetail";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const Navbar = () => {
+  const { user, logout } = useAuth();
   return (
-    <>
+    <nav className="flex items-center justify-between p-4 bg-blue-600 text-white">
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <span className="font-bold text-xl">Q&A Forum</span>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className="space-x-4">
+        {user ? (
+          <>
+            <Link to="/profile">Profile</Link>
+            <button onClick={logout} className="bg-red-500 px-3 py-1 rounded">Logout</button>
+          </>
+        ) : null}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </nav>
+  );
+};
+
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  if (loading) return null;
+  return user ? children : <Navigate to="/auth" state={{ from: location }} replace />;
 }
 
-export default App
+function App() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return (
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={user ? <Navigate to="/feed" replace /> : <Home />} />
+        <Route path="/auth" element={user ? <Navigate to="/feed" replace /> : <Auth />} />
+        <Route path="/feed" element={
+          <ProtectedRoute>
+            <Feed />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/question/:id" element={
+          <ProtectedRoute>
+            <QuestionDetail />
+          </ProtectedRoute>
+        } />
+        {/* Redirect all other routes */}
+        <Route path="*" element={<Navigate to={user ? "/feed" : "/auth"} replace />} />
+      </Routes>
+    </>
+  );
+}
+
+export default App;
