@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "community-qna-forum"
-  }
+    "default": "community-forum-4c659"
+  },
+  "targets": {},
+  "etags": {}
 }
