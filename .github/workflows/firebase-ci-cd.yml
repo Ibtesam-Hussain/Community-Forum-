@@ -45,7 +45,7 @@ jobs:
 
       # Deploy to Firebase Hosting (only if all above succeed)
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@latest
+        uses: w9jds/firebase-action@v12
         with:
           args: deploy --only hosting
         env:
