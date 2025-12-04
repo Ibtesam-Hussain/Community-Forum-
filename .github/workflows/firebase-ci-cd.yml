@@ -44,9 +44,13 @@ jobs:
         run: npm run build
 
       # Deploy to Firebase Hosting (only if all above succeed)
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@v12
+      - name: Setup Firebase CLI
+        uses: w9jds/setup-firebase@main
         with:
-          args: deploy --only hosting
+          tools-version: 11.9.0
+          firebase_token: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Deploy to Firebase Hosting
+        run: firebase deploy --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
