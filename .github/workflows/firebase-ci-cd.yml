@@ -1,0 +1,52 @@
+name: React CI/CD with Firebase
+
+on:
+  push:
+    branches:
+      - main   # Triggers the workflow on push to main branch
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Cache node_modules for faster builds
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Run static code analysis (optional but recommended)
+      - name: Run ESLint
+        run: npm run lint
+
+      # Run automated tests 
+      - name: Run Tests
+        run: npm test -- --watchAll=false
+
+      # Build the React app
+      - name: Build project
+        run: npm run build
+
+      # Deploy to Firebase Hosting (only if all above succeed)
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@v13
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
